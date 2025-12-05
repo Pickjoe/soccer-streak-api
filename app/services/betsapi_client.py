@@ -11,31 +11,48 @@ load_dotenv()
 # Ohio-legal league IDs (confirmed from full catalog)
 OHIO_TARGET_LEAGUE_IDS = {
     # English Football
-    "94": "England Premier League",
-    "880": "England Championship",
-    "587": "England League 1",
-    "611": "England League 2",
+    "94": "Premier League",
+    "880": "EFL Championship",
+    "587": "EFL League One",
+    "611": "EFL League Two",
+    "1259": "EFL Cup",
+    "2481": "FA Cup",
 
-    # Major European Leagues
-    "207": "Spain Primera Liga (La Liga)",
-    "199": "Italy Serie A",
-    "123": "Germany Bundesliga I",
-    "99": "France Ligue 1",
-    "172": "Portugal Primeira Liga",
+    # Spain
+    "207": "LaLiga",
+    "425": "Copa del Rey",
+
+    # Italy
+    "199": "Serie A",
+
+    # Germany
+    "123": "Bundesliga",
+
+    # France
+    "99": "Ligue 1",
+
+    # Portugal
+    "172": "Liga Portugal",
+
+    # Greece
+    "910": "Super League Greece",
+    "2267": "Greek Cup",
+
+    # Japan
+    "895": "J1 League",
+
+    # Americas
+    "242": "MLS",
+    "32373": "Liga MX",
+
+    # Saudi Arabia
+    "34172": "Saudi Pro League",
 
     # European Competitions
     "1040": "UEFA Champions League",
     "1067": "UEFA Europa League",
-    "34541": "UEFA Conference League",
-
-    # Other Target Leagues
-    "34172": "Saudi Arabia Pro League",
-    "242": "USA MLS",
-    "373": "Mexico Liga MX",
-    "910": "Greece Super League 1",
-    "66": "Netherlands Eredivisie"
+    "34541": "UEFA Europa Conference League",
 }
-
 
 class BetsAPIClient:
     def __init__(self):
