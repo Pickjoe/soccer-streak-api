@@ -19,7 +19,7 @@ OHIO_TARGET_LEAGUE_IDS = {
     "2481": "FA Cup",
 
     # Spain
-    "207": "LaLiga",
+    "38223": "LaLiga",
     "425": "Copa del Rey",
 
     # Italy
