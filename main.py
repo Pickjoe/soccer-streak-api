@@ -46,24 +46,28 @@ def get_games_by_date(date: str):
         )
 
     today = datetime.now().date()
-    is_past = target_date < today
 
-    # --- 2. Decide which source to use: ended vs upcoming ---
-    if is_past:
+    if target_date < today:
+        # Past date: ended only
         game_type = "ended"
         date_label_suffix = "Ended Games"
-
-        # First page for pager info
         first_page = betsapi.get_ended_games(day=date, skip_esports=True)
-        # All ended games for that day
         all_games = betsapi.get_all_ended_games_paginated(day=date, skip_esports=True)
+
+    elif target_date == today:
+        # Today: both ended + upcoming
+        game_type = "both"
+        date_label_suffix = "Ended + Upcoming Games"
+        first_page = betsapi.get_ended_games(day=date, skip_esports=True)
+        ended_games = betsapi.get_all_ended_games_paginated(day=date, skip_esports=True)
+        upcoming_games = betsapi.get_all_upcoming_games_paginated(day=date, skip_esports=True)
+        all_games = ended_games + upcoming_games
+
     else:
+        # Future date: upcoming only
         game_type = "upcoming"
         date_label_suffix = "Upcoming Games"
-
-        # First page for pager info (upcoming)
         first_page = betsapi.get_upcoming_games(day=date, skip_esports=True)
-        # All upcoming games for that day
         all_games = betsapi.get_all_upcoming_games_paginated(day=date, skip_esports=True)
 
     # Make sure we have a dict before trying to use .get()
