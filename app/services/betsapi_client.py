@@ -189,6 +189,8 @@ OHIO_TARGET_LEAGUE_IDS = {
     "598": "Friendlies",
     "375": "World Club Friendlies",
     "631": "Elite Club Friendlies",
+    "23911":"mexico liga mx de expansion"
+
 }
 class BetsAPIClient:
     def __init__(self):
