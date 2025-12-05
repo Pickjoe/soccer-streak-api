@@ -116,3 +116,13 @@ class Game:
 
     def __repr__(self):
         return f"Game(id={self.id}, {self.home_name} vs {self.away_name}, score={self.raw_score})"
+
+    def get_eastern_time_string(self) -> str:
+        """Convert timestamp to Eastern Time formatted string"""
+        from zoneinfo import ZoneInfo
+
+        utc_dt = datetime.utcfromtimestamp(self.time)
+        utc_dt = utc_dt.replace(tzinfo=ZoneInfo('UTC'))
+        eastern_dt = utc_dt.astimezone(ZoneInfo('America/New_York'))
+
+        return eastern_dt.strftime('%b %d, %Y %I:%M %p ET')
