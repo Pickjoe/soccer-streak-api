@@ -82,6 +82,7 @@ OHIO_TARGET_LEAGUE_IDS = {
     "5958": "Supercopa MX",
     "3277":" Mexico Clausura",
     "219":" Mexico Apertura",
+    "310":"mexico apertura play in",
 
     # ===================
     # USA
