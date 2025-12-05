@@ -1,10 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
+from datetime import datetime
+import time
+
 from app.services.betsapi_client import betsapi
 from app.services.streak_analyzer import streak_analyzer
 from app.models.game import Game
-import time
+import uvicorn
+
 app = FastAPI(
     title="Soccer Streak Analyzer API",
     description="Ohio-legal soccer betting analysis API",
@@ -28,42 +31,73 @@ def read_root():
 @app.get("/api/v1/games/{date}")
 def get_games_by_date(date: str):
     """
-    Get Ohio-legal games with streak analysis
+    Get Ohio-legal games with streak analysis.
 
     Args:
         date: YYYYMMDD format (e.g., 20240301)
     """
-    # Get first page to see pagination info
-    first_page = betsapi.get_ended_games(day=date, skip_esports=True)
-    pager = first_page.get('pager', {})
+    # --- 1. Validate and parse date ---
+    try:
+        target_date = datetime.strptime(date, "%Y%m%d").date()
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid date format. Use YYYYMMDD, e.g. 20240301."
+        )
 
-    # Get all ended games
-    all_ended_games = betsapi.get_all_ended_games_paginated(date, skip_esports=True)
-    # Filter for Ohio-legal games
-    ohio_ended = betsapi.get_ohio_legal_games_by_id(all_ended_games, 'ended')
+    today = datetime.now().date()
+    is_past = target_date < today
 
-    # Format for API response
+    # --- 2. Decide which source to use: ended vs upcoming ---
+    if is_past:
+        game_type = "ended"
+        date_label_suffix = "Ended Games"
+
+        # First page for pager info
+        first_page = betsapi.get_ended_games(day=date, skip_esports=True)
+        # All ended games for that day
+        all_games = betsapi.get_all_ended_games_paginated(day=date, skip_esports=True)
+    else:
+        game_type = "upcoming"
+        date_label_suffix = "Upcoming Games"
+
+        # First page for pager info (upcoming)
+        first_page = betsapi.get_upcoming_games(day=date, skip_esports=True)
+        # All upcoming games for that day
+        all_games = betsapi.get_all_upcoming_games_paginated(day=date, skip_esports=True)
+
+    # Make sure we have a dict before trying to use .get()
+    pager = first_page.get("pager", {}) if isinstance(first_page, dict) else {}
+
+    # --- 3. Filter for Ohio-legal games ---
+    ohio_games = betsapi.get_ohio_legal_games_by_id(all_games, game_type)
+
+    # --- 4. For each game, get history + streaks + signal ---
     formatted_games = []
-    for game in ohio_ended:
-        league_name = game.get('ohio_league_name', 'Unknown')
-        home = game.get('home', {}).get('name', 'Unknown')
-        away = game.get('away', {}).get('name', 'Unknown')
-        score = game.get('ss', 'No score')
-        game_time = int(game.get('time', 0))
-        game_id = game.get('id')
 
-        # Get event history (max 20 games)
+    for game in ohio_games:
+        league_name = game.get("ohio_league_name", "Unknown")
+        home = game.get("home", {}).get("name", "Unknown")
+        away = game.get("away", {}).get("name", "Unknown")
+        score = game.get("ss", "No score")
+        game_time = int(game.get("time", 0) or 0)
+        game_id = game.get("id")
+
+        # Fetch event history (past matches / H2H) - works for both ended & upcoming
         history = betsapi.get_event_history(game_id, qty=20)
-        time.sleep(0.5)
-        results = history.get('results', {})
+        time.sleep(0.5)  # throttle / respect rate limits
 
-        # Analyze streaks
-        home_streak = streak_analyzer.analyze_from_history(game_time, results.get('home', []))
-        away_streak = streak_analyzer.analyze_from_history(game_time, results.get('away', []))
+        results = history.get("results", {}) if isinstance(history, dict) else {}
+        home_history = results.get("home", []) or []
+        away_history = results.get("away", []) or []
+
+        home_streak = streak_analyzer.analyze_from_history(game_time, home_history)
+        away_streak = streak_analyzer.analyze_from_history(game_time, away_history)
         signal = streak_analyzer.get_signal(home_streak, away_streak)
 
-        # Convert time to Eastern
+        # Convert kickoff time to Eastern using your Game model
         game_obj = Game(game)
+        kickoff_time_str = game_obj.get_eastern_time_string()
 
         formatted_games.append({
             "game_id": game_id,
@@ -71,21 +105,30 @@ def get_games_by_date(date: str):
             "away_team": away,
             "score": score,
             "league": league_name,
-            "kickoff_time": game_obj.get_eastern_time_string(),
+            "kickoff_time": kickoff_time_str,
             "home_streak": home_streak,
             "away_streak": away_streak,
             "signal": signal
         })
 
+    # --- 5. Pagination info (safe calc) ---
+    total = int(pager.get("total", 0) or 0)
+    per_page = int(pager.get("per_page", 50) or 50)
+    if per_page > 0 and total > 0:
+        pages_fetched = (total + per_page - 1) // per_page
+    else:
+        pages_fetched = 0
+
+    # --- 6. Final response ---
     return {
         "success": True,
-        "date": f"{date} (Ended Games)",
+        "date": f"{date} ({date_label_suffix})",
         "pagination": {
-            "total_games": pager.get('total', 0),
-            "per_page": pager.get('per_page', 0),
-            "pages_fetched": (pager.get('total', 0) + pager.get('per_page', 50) - 1) // pager.get('per_page', 50)
+            "total_games": total,
+            "per_page": per_page,
+            "pages_fetched": pages_fetched
         },
-        "ohio_legal_games": len(ohio_ended),
+        "ohio_legal_games": len(ohio_games),
         "games": formatted_games
     }
 

@@ -112,9 +112,8 @@ class BetsAPIClient:
         response = self._make_request('events/upcoming', params)
 
         if response.get('success'):
-            games = response.get('results', [])
-            print(f"✅ Found {len(games)} upcoming games")
-            return games
+            return response
+
         else:
             print(f"❌ No upcoming games found")
             return []
@@ -298,5 +297,89 @@ class BetsAPIClient:
                 break
 
         return all_games
+
+    def get_all_ended_games_paginated(self, day: str, skip_esports: bool = True) -> List[Dict]:
+        """Get ALL ended games by fetching all pages"""
+
+        all_games = []
+        page = 1
+
+        while True:
+            params = {
+                'sport_id': 1,  # Soccer
+                'day': day,
+                'page': page
+            }
+
+            if skip_esports:
+                params['skip_esports'] = 1
+
+            response = self._make_request('events/ended', params)
+
+            if response.get('success'):
+                results = response.get('results', [])
+                if not results:
+                    break  # No more results
+
+                all_games.extend(results)
+
+                # Check if we have more pages
+                pager = response.get('pager', {})
+                total_pages = (pager.get('total', 0) + pager.get('per_page', 50) - 1) // pager.get('per_page', 50)
+
+                if page >= total_pages:
+                    break
+
+                page += 1
+            else:
+                break
+
+        return all_games
+    def get_all_upcoming_games_paginated(self, day: str, skip_esports: bool = True) -> List[Dict]:
+        """Get ALL upcoming games by fetching all pages"""
+
+        all_games = []
+        page = 1
+
+        while True:
+            params = {
+                'sport_id': 1,  # Soccer
+                'day': day,
+                'page': page
+            }
+
+            if skip_esports:
+                params['skip_esports'] = 1
+
+            # Note: endpoint is 'events/upcoming' now
+            response = self._make_request('events/upcoming', params)
+
+            if response.get('success'):
+                results = response.get('results', [])
+                if not results:
+                    break  # No more results
+
+                all_games.extend(results)
+
+                # Pagination logic (same as ended)
+                pager = response.get('pager', {}) or {}
+                total = pager.get('total', 0) or 0
+                per_page = pager.get('per_page', 50) or 50
+
+                # Protect against division by zero
+                if per_page <= 0:
+                    break
+
+                total_pages = (total + per_page - 1) // per_page
+
+                if page >= total_pages:
+                    break
+
+                page += 1
+            else:
+                break
+
+        return all_games
+
 # Global instance
 betsapi = BetsAPIClient()
