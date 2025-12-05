@@ -10,50 +10,186 @@ load_dotenv()
 
 # Ohio-legal league IDs (confirmed from full catalog)
 OHIO_TARGET_LEAGUE_IDS = {
-    # English Football
+    # ===================
+    # ENGLAND
+    # ===================
     "94": "Premier League",
     "880": "EFL Championship",
     "587": "EFL League One",
     "611": "EFL League Two",
-    "1259": "EFL Cup",
+    "1259": "EFL Cup (Carabao Cup)",
     "2481": "FA Cup",
+    "1814": "FA Trophy",
+    "394": "EFL Trophy",
+    "30510": "Community Shield",
 
-    # Spain
-    "38223": "LaLiga",
+    # ===================
+    # SPAIN
+    # ===================
+    "38223": "La Liga",
     "425": "Copa del Rey",
+    "6426": "Supercopa de España",
 
-    # Italy
+    # ===================
+    # ITALY
+    # ===================
     "199": "Serie A",
+    "2916": "Coppa Italia",
+    "3179": "Supercoppa Italiana",
 
-    # Germany
+    # ===================
+    # GERMANY
+    # ===================
     "123": "Bundesliga",
+    "2266": "DFB Pokal",
+    "6307": "DFL Supercup",
 
-    # France
+    # ===================
+    # FRANCE
+    # ===================
     "99": "Ligue 1",
+    "1789": "Coupe de France",
+    "6197": "Trophée des Champions",
 
-    # Portugal
-    "172": "Liga Portugal",
+    # ===================
+    # PORTUGAL
+    # ===================
+    "172": "Primeira Liga",
+    "614": "Taça de Portugal",
+    "1781": "Taça da Liga",
+    "6308": "Supertaça Cândido de Oliveira",
 
-    # Greece
+    # ===================
+    # GREECE
+    # ===================
     "910": "Super League Greece",
     "2267": "Greek Cup",
 
-    # Japan
+    # ===================
+    # JAPAN
+    # ===================
     "895": "J1 League",
+    "13": "Emperor's Cup",
+    "409": "J.League Cup (Levain Cup)",
+    "3852": "Japanese Super Cup",
 
-    # Americas
-    "242": "MLS",
+    # ===================
+    # MEXICO
+    # ===================
     "32373": "Liga MX",
+    "1044": "Copa MX",
+    "5961": "Campeón de Campeones",
+    "5958": "Supercopa MX",
 
-    # Saudi Arabia
+    # ===================
+    # USA
+    # ===================
+    "242": "MLS",
+    "1045": "US Open Cup",
+    "17650": "Leagues Cup",
+    "34801": "Campeones Cup",
+
+    # ===================
+    # SAUDI ARABIA
+    # ===================
     "34172": "Saudi Pro League",
+    "3467": "King Cup",
+    "21661": "Saudi Super Cup",
 
-    # European Competitions
+    # ===================
+    # EUROPEAN CLUB COMPETITIONS
+    # ===================
     "1040": "UEFA Champions League",
+    "5708": "UEFA Champions League Qualifying",
     "1067": "UEFA Europa League",
-    "34541": "UEFA Europa Conference League",
-}
+    "5720": "UEFA Europa League Qualifying",
+    "34541": "UEFA Conference League",
+    "33931": "UEFA Conference League Qualifying",
+    "6388": "UEFA Super Cup",
+    "1018": "UEFA Youth League",
 
+    # ===================
+    # INTERNATIONAL - UEFA
+    # ===================
+    "12051": "UEFA Nations League",
+    "30974": "UEFA Nations League A",
+    "30973": "UEFA Nations League B",
+    "30976": "UEFA Nations League C",
+    "30975": "UEFA Nations League D",
+    "681": "World Cup Qualifying (UEFA)",
+    "35624": "Euro 2024",
+    "11035": "Euro 2020",
+    "5477": "European U21 Championship",
+    "461": "European U21 Championship Qualifying",
+    "4291": "European U19 Championship",
+    "9999": "U17 European Championship",
+
+    # ===================
+    # INTERNATIONAL - CONCACAF
+    # ===================
+    "4374": "CONCACAF Gold Cup",
+    "26297": "CONCACAF Gold Cup Qualifying",
+    "36174": "CONCACAF Champions Cup",
+    "1043": "CONCACAF Champions League",
+    "6288": "CONCACAF League",
+    "14717": "CONCACAF Nations League",
+    "12056": "CONCACAF Nations League Qualifying",
+    "28749": "World Cup Qualifying (CONCACAF)",
+    "2175": "CONCACAF U20 Championship",
+    "15599": "CONCACAF U17 Championship",
+
+    # ===================
+    # INTERNATIONAL - CONMEBOL
+    # ===================
+    "14180": "Copa America",
+    "3514": "Copa Libertadores",
+    "32482": "Copa Libertadores Qualifying",
+    "445": "Copa Sudamericana",
+    "4462": "Recopa Sudamericana",
+    "3468": "U20 South American Championship",
+    "473": "World Cup Qualifying (CONMEBOL)",
+
+    # ===================
+    # INTERNATIONAL - AFC (ASIA)
+    # ===================
+    "767": "AFC Asian Cup",
+    "4314": "AFC Asian Cup Qualifying",
+    "1014": "AFC Champions League",
+    "38252": "AFC Champions League Elite",
+    "38266": "AFC Champions League Two",
+    "29060": "AFC Champions League Qualifying",
+    "1019": "AFC Cup",
+    "455": "World Cup Qualifying (AFC)",
+    "5946": "AFC U23 Championship",
+    "1934": "AFC U19 Championship",
+
+    # ===================
+    # INTERNATIONAL - CAF (AFRICA)
+    # ===================
+    "3361": "Africa Cup of Nations",
+    "511": "Africa Cup of Nations Qualifying",
+    "1102": "CAF Champions League",
+    "1131": "CAF Confederations Cup",
+    "3861": "CAF Super Cup",
+    "1735": "World Cup Qualifying (CAF)",
+    "8445": "African Nations Championship",
+
+    # ===================
+    # INTERNATIONAL - FIFA / WORLD
+    # ===================
+    "3034": "FIFA Club World Cup",
+    "38782": "FIFA Intercontinental Cup",
+    "33207": "World Cup 2026",
+    "29334": "World Cup 2022",
+    "8538": "World Cup 2018",
+    "5071": "FIFA U20 World Cup",
+    "7396": "FIFA U17 World Cup",
+    "24458": "World Cup Qualifying",
+    "250": "International Match",
+    "598": "Friendlies",
+    "375": "World Club Friendlies",
+    "631": "Elite Club Friendlies",
+}
 class BetsAPIClient:
     def __init__(self):
         self.token = "60160-2APiC3gXTwG7oG"
